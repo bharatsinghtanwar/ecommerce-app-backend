@@ -5,9 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.userpanel.greeneryonwheels.model.Products;
 import com.userpanel.greeneryonwheels.service.ProductService;
@@ -22,7 +20,13 @@ public class ProductController {
 	@GetMapping("/all")	
 	public ResponseEntity<List<Products>> getProducts(){
 		
-		List<Products> body = productService.listOfProducts();
-		return new ResponseEntity<>(body, HttpStatus.OK);
+		List<Products> productsList = productService.listOfProducts();
+		return new ResponseEntity<>(productsList, HttpStatus.OK);
+	}
+
+	@PostMapping("/save")
+	public ResponseEntity<Products> saveProducts(@RequestBody Products products){
+		Products products1 = productService.persisTheProduct(products);
+		return new ResponseEntity<>(products1, HttpStatus.OK);
 	}
 }

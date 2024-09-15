@@ -1,8 +1,8 @@
 package com.userpanel.greeneryonwheels.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,11 +11,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "products")
 public class Products {
 
 	@Id
+	@Column(name = "product_id")
 	private int productid;
+	@Column(name = "product_name")
 	private String name;
-	private String Description;
+	@Column(name = "product_description")
+	private String description;
+	@Column(name = "product_price")
 	private double price;
 }
