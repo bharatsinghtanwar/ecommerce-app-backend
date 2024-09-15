@@ -1,32 +1,44 @@
 package com.userpanel.greeneryonwheels.controller;
 
-import java.util.List;
 
+import com.userpanel.greeneryonwheels.model.Product;
+import com.userpanel.greeneryonwheels.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.userpanel.greeneryonwheels.model.Products;
-import com.userpanel.greeneryonwheels.service.ProductService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 public class ProductController {
 
 	@Autowired
 	private ProductService productService;
-	
-	@GetMapping("/all")	
-	public ResponseEntity<List<Products>> getProducts(){
-		
-		List<Products> productsList = productService.listOfProducts();
-		return new ResponseEntity<>(productsList, HttpStatus.OK);
+
+	@GetMapping
+	public List<Product> getAllProducts() {
+		return productService.getAllProducts();
 	}
 
-	@PostMapping("/save")
-	public ResponseEntity<Products> saveProducts(@RequestBody Products products){
-		Products products1 = productService.persisTheProduct(products);
-		return new ResponseEntity<>(products1, HttpStatus.OK);
+	@GetMapping("/{id}")
+	public Product getProductById(@PathVariable Long id) {
+		return productService.getProductById(id);
+	}
+
+	@GetMapping("/category/{categoryId}")
+	public List<Product> getProductsByCategory(@PathVariable Long categoryId) {
+		return productService.getProductsByCategory(categoryId);
+	}
+
+	@PostMapping
+	public Product createProduct(@RequestBody Product product) {
+		return productService.saveProduct(product);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+		productService.deleteProduct(id);
+		return ResponseEntity.ok().build();
 	}
 }

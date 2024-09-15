@@ -1,9 +1,10 @@
 package com.userpanel.greeneryonwheels.dao;
 
+import com.userpanel.greeneryonwheels.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.userpanel.greeneryonwheels.model.Products;
+import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Products, Integer> {
-
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByCategoryId(Long categoryId);
 }
