@@ -1,6 +1,5 @@
 package com.userpanel.greeneryonwheels.model;
 
-import com.userpanel.greeneryonwheels.model.Product;
 import jakarta.persistence.*;
 import lombok.Data;
 

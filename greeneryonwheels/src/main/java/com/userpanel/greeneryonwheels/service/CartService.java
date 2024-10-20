@@ -10,6 +10,8 @@ import com.userpanel.greeneryonwheels.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,29 +30,41 @@ public class CartService {
         }
         Product product = productOpt.get();
 
-        Cart cart = cartRepository.findByUserId(userId).orElse(new Cart());
-        cart.setUser(new User(userId));
+        Optional<Cart> cart = cartRepository.findByUserId(userId);
+        if (cart.isPresent()){
+            Optional<CartItem> existingItemOpt = cart.get().getCartItems().stream()
+                    .filter(item -> item.getProduct().getId().equals(productId))
+                    .findFirst();
+            if(existingItemOpt.isPresent()){
+                CartItem existingItem = existingItemOpt.get();
+                existingItem.setQuantity(existingItem.getQuantity() + quantity);
+                existingItem.setPrice(existingItem.getQuantity() * product.getPrice());
+                cart.get().setTotalPrice(cart.get().getCartItems().stream().mapToDouble(CartItem::getPrice).sum());
+                return cartRepository.save(cart.get());
+            } else{
+                CartItem newCartItems = new CartItem();
+                newCartItems.setQuantity(quantity);
+                newCartItems.setPrice(newCartItems.getQuantity() * product.getPrice());
+                cart.get().setTotalPrice(newCartItems.getPrice());
+                return cartRepository.save(cart.get());
+            }
 
-        // Find existing cart item
-        Optional<CartItem> existingItemOpt = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst();
-
-        if (existingItemOpt.isPresent()) {
-            CartItem existingItem = existingItemOpt.get();
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setPrice(existingItem.getQuantity() * product.getPrice());
         } else {
+            Cart cart1 = new Cart();
+            cart1.setUser(new User(userId));
+            cart1.setTotalPrice(0.0);
+            Cart newCart = cartRepository.save(cart1);
+
             CartItem newItem = new CartItem();
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
             newItem.setPrice(product.getPrice() * quantity);
-            cart.getCartItems().add(newItem);
+            List<CartItem> cartItemList = new ArrayList<>();
+            cartItemList.add(newItem);
+            newCart.setCartItems(cartItemList);
+            newCart.setTotalPrice(newCart.getCartItems().stream().mapToDouble(CartItem::getPrice).sum());
+            return cartRepository.save(newCart);
         }
-
-        cart.setTotalPrice(cart.getCartItems().stream().mapToDouble(CartItem::getPrice).sum());
-
-        return cartRepository.save(cart);
     }
 
     public Cart removeFromCart(Long userId, Long productId) {
